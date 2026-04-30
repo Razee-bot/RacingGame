@@ -35,24 +35,63 @@ public class CarController : MonoBehaviour
     {
         if (!canMove) return;
 
-        // ── Forward / Backward movement ───────────────────────────
-        float finalSpeed = moveSpeed * speedMultiplier;
-        Vector2 moveForce = transform.up * moveInput * finalSpeed;
-        rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, moveForce, 0.1f);
+        // ── Get current speed in forward direction ─────────────────
+        float currentSpeed = Vector2.Dot(rb.linearVelocity, transform.up);
+        float maxSpeed = moveSpeed * speedMultiplier;
 
-        // ── Turning (only turn when moving) ───────────────────────
-        float speed = rb.linearVelocity.magnitude;
-        if (speed > 0.1f)
+        // ── Acceleration & Braking ────────────────────────────────
+        float acceleration = 0f;
+
+        if (moveInput > 0) // Forward
+        {
+            // Accelerate gradually, but not beyond max speed
+            if (currentSpeed < maxSpeed)
+            {
+                acceleration = moveInput * moveSpeed * 2f * Time.fixedDeltaTime;
+            }
+        }
+        else if (moveInput < 0) // Reverse/Brake
+        {
+            if (currentSpeed > 0.5f)
+            {
+                // Braking: gradual slowdown, not instant stop
+                acceleration = moveInput * moveSpeed * 1.5f * Time.fixedDeltaTime;
+            }
+            else
+            {
+                // Allow slow reverse when nearly stopped
+                acceleration = moveInput * (moveSpeed * 0.5f) * Time.fixedDeltaTime;
+            }
+        }
+        else
+        {
+            // No input: natural deceleration (friction)
+            float deceleration = 1.5f * Time.fixedDeltaTime;
+            if (currentSpeed > 0)
+            {
+                currentSpeed = Mathf.Max(0, currentSpeed - deceleration);
+            }
+            else if (currentSpeed < 0)
+            {
+                currentSpeed = Mathf.Min(0, currentSpeed + deceleration);
+            }
+        }
+
+        // Apply acceleration to velocity
+        Vector2 newVelocity = transform.up * (currentSpeed + acceleration);
+
+        // ── Turning (only turn when moving) ────────────────────────
+        if (Mathf.Abs(currentSpeed) > 0.1f)
         {
             float turnDir = -turnInput * turnSpeed * Time.fixedDeltaTime;
             // Flip turn direction when reversing
-            if (moveInput < 0) turnDir = -turnDir;
+            if (currentSpeed < 0) turnDir = -turnDir;
             rb.rotation += turnDir;
         }
 
-        // ── Reduce sideways drift (makes it feel like a car) ──────
-        Vector2 forwardVel = transform.up * Vector2.Dot(rb.linearVelocity, transform.up);
-        Vector2 rightVel   = transform.right * Vector2.Dot(rb.linearVelocity, transform.right);
+        // ── Reduce sideways drift (makes it feel like a car) ───────
+        Vector2 forwardVel = transform.up * Vector2.Dot(newVelocity, transform.up);
+        Vector2 rightVel   = transform.right * Vector2.Dot(newVelocity, transform.right);
         rb.linearVelocity = forwardVel + rightVel * driftFactor;
     }
 }
