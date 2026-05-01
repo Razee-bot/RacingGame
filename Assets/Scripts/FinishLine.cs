@@ -3,27 +3,45 @@ using UnityEngine.SceneManagement;
 
 public class FinishLine : MonoBehaviour
 {
-    private bool finished = false;
+    [SerializeField] private int lapsRequired = 3; 
+    private int completedLaps = 0;
+    private bool isFinished = false;
+    private float lastTriggerTime = 0f;
+    private float triggerCooldown = 1.5f; 
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (finished) return;   // prevent triggering twice
+        if (isFinished || !other.CompareTag("Player")) return;
+        
+        // Prevent double-counting if the car stays in the trigger for multiple frames
+        if (Time.time < lastTriggerTime + triggerCooldown) return;
 
-        if (other.CompareTag("Player"))
+        lastTriggerTime = Time.time;
+        completedLaps++;
+
+        // If you want to finish on the 3rd crossing:
+        if (completedLaps >= lapsRequired)
         {
-            finished = true;
-
-            // Stop the timer
-            RaceTimer timer = FindObjectOfType<RaceTimer>();
-            if (timer != null) timer.StopTimer();
-
-            // Freeze the car
-            CarController car = other.GetComponent<CarController>();
-            if (car != null) car.canMove = false;
-
-            // Load Finish Screen after 1 second delay
-            Invoke(nameof(LoadFinishScreen), 1f);
+            HandleRaceFinish(other.gameObject);
         }
+        else
+        {
+            Debug.Log($"Lap {completedLaps} registered! Laps to go: {lapsRequired - completedLaps}");
+        }
+    }
+
+    void HandleRaceFinish(GameObject player)
+    {
+        isFinished = true;
+        Debug.Log("Race Finished!");
+
+        RaceTimer timer = FindObjectOfType<RaceTimer>();
+        if (timer != null) timer.StopTimer();
+
+        CarController car = player.GetComponent<CarController>();
+        if (car != null) car.canMove = false;
+
+        Invoke(nameof(LoadFinishScreen), 1f);
     }
 
     void LoadFinishScreen()

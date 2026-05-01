@@ -4,9 +4,9 @@ public class CarController : MonoBehaviour
 {
     // ── Tunable values (adjust in Inspector) ──────────────────
     [Header("Movement Settings")]
-    public float moveSpeed = 8f;       // base forward speed
+    public float moveSpeed = 5f;       // base forward speed
     public float turnSpeed = 160f;     // rotation speed (degrees/sec)
-    public float driftFactor = 0.95f;  // 1 = no drift, 0 = full drift
+    public float driftFactor = 0.0f;  // 1 = no drift, 0 = full drift
 
     // ── Runtime speed modifier (changed by boost/slow zones) ──
     [HideInInspector] public float speedMultiplier = 1f;
@@ -54,7 +54,7 @@ public class CarController : MonoBehaviour
         {
             if (currentSpeed > 0.5f)
             {
-                // Braking: gradual slowdown, not instant stop
+                // Braking: gradual slowdown, not an instant stop
                 acceleration = moveInput * moveSpeed * 1.5f * Time.fixedDeltaTime;
             }
             else
