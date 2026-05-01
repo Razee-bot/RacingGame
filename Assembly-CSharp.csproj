@@ -52,6 +52,7 @@
     <Compile Include="Assets\Scripts\Slowzone.cs" />
     <Compile Include="Assets\Scripts\LeaderboardManager.cs" />
     <Compile Include="Assets\Scripts\RaceTimer.cs" />
+    <Compile Include="Assets\Scripts\MainMenuManager.cs" />
     <Compile Include="Assets\Scripts\BoostZone.cs" />
     <Compile Include="Assets\Scripts\CarController.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
