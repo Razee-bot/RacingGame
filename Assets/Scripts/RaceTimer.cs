@@ -7,7 +7,12 @@ public class RaceTimer : MonoBehaviour
 
     public static float finalTime = 0f;  // shared with FinishScreen scene
     private float  elapsed  = 0f;
-    private bool   running  = true;
+    private bool running = false; // change this to false so it doesn't start immediately
+
+    public void StartTimer()
+    {
+    running = true;
+    }
 
     void Update()
     {
