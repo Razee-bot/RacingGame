@@ -19,6 +19,18 @@ public class LeaderboardManager : MonoBehaviour
     public string gameSceneName = "GameScene";
     public string mainMenuSceneName = "MainMenu";
 
+    public void PlayGame()
+    {
+    Debug.Log("Restart button clicked!");
+    SceneManager.LoadScene(gameSceneName);
+    }
+
+    public void LoadMainMenu()
+    {
+    Debug.Log("Main Menu button clicked!");
+    SceneManager.LoadScene(mainMenuSceneName);
+    }
+
     void Start()
     {
         float current = RaceTimer.finalTime;
@@ -49,11 +61,6 @@ public class LeaderboardManager : MonoBehaviour
             bestTimeText.text = "Best Time\n" + FormatTime(best);
 
         // Buttons
-        if (restartButton)
-            restartButton.onClick.AddListener(() => SceneManager.LoadScene(gameSceneName));
-
-        if (mainMenuButton)
-            mainMenuButton.onClick.AddListener(() => SceneManager.LoadScene(mainMenuSceneName));
     }
 
     string FormatTime(float t)
